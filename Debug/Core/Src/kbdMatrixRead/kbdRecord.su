@@ -1,0 +1,2 @@
+kbdRecord.c:18:6:kbdRecord	56	static
+kbdRecord.c:122:6:kbdMatrixRead	40	static
