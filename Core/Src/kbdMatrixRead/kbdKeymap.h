@@ -13,6 +13,8 @@
 #include "kbdLayout.h"
 
 
+
+
 const uint16_t keymap_azerty[][MATRIX_COLS][MATRIX_ROWS] = {
     LAYOUT(\
         KEY_ESC, 		KEY_1,			KEY_2,		KEY_3,   KEY_4,   KEY_5,   KEY_6,   KEY_7,   KEY_8,   KEY_9,   		KEY_0,   		KEY_MINUS,		KEY_EQUAL, 		KEY_BACKSPACE,\

@@ -14,6 +14,7 @@ uint8_t currentKeymapLevel=0;
 uint8_t currentModifier=0;
 
 extern osMessageQueueId_t keyboardRecordQueueHandle;
+extern osEventFlagsId_t kbdHMIeventHandle;
 
 char kbdRecord(uint8_t *currentPressedKeys ){
 
@@ -40,16 +41,17 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 	if (matrixChanged==True)
 	{
 
-
 		memset(&keyMsgQueueObj, 0, sizeof keyMsgQueueObj);
 		keyIdx=0;
 
 		if(isValueInArray(KBD_LAYOUT_UP,currentPressedKeys,KEY_PRESS_NB_MAX)){
-			currentKeymapLevel++;
+			//currentKeymapLevel++;
+			osEventFlagsSet(kbdHMIeventHandle, 1);
 		}
 
 		if(isValueInArray(KBD_LAYOUT_DOWN,currentPressedKeys,KEY_PRESS_NB_MAX)){
-			currentKeymapLevel--;
+			//currentKeymapLevel--;
+			osEventFlagsSet(kbdHMIeventHandle, 2);
 		}
 
 

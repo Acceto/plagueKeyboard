@@ -20,8 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "cmsis_os.h"
-
-
+#include "usb_device.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -34,6 +33,13 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+
+#define FLAG_LAYOUT_PAGE_UP 	0b0000000000000001
+#define FLAG_LAYOUT_PAGE_DOWN 	0b0000000000000010
+#define FLAG_MAJLOCK_SET		0b0000000000000100
+#define FLAG_MAJLOCK_RESET		0b0000000000001000
+#define FLAG_SCROLLLOCK_SET		0b0000000000010000
+#define FLAG_SCROLLLOCK_RESET	0b0000000000100000
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -68,8 +74,13 @@ osMessageQueueId_t keyboardRecordQueueHandle;
 const osMessageQueueAttr_t keyboardRecordQueue_attributes = {
   .name = "keyboardRecordQueue"
 };
+/* Definitions for kbdHMIevent */
+osEventFlagsId_t kbdHMIeventHandle;
+const osEventFlagsAttr_t kbdHMIevent_attributes = {
+  .name = "kbdHMIevent"
+};
 /* USER CODE BEGIN PV */
-
+extern uint8_t currentKeymapLevel;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,7 +112,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+   HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -117,7 +128,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   /* USER CODE BEGIN 2 */
-
+  LEDkeymapLevel(currentKeymapLevel);
   /* USER CODE END 2 */
 
   /* Init scheduler */
@@ -156,6 +167,10 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
+
+  /* Create the event(s) */
+  /* creation of kbdHMIevent */
+  kbdHMIeventHandle = osEventFlagsNew(&kbdHMIevent_attributes);
 
   /* USER CODE BEGIN RTOS_EVENTS */
   /* add events, ... */
@@ -286,11 +301,34 @@ void LED_INIT(void){
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
+}
+
+void LEDkeymapLevel(uint8_t KBDlayoutLevel){
+	switch(KBDlayoutLevel){
+		default:
+		case 0:
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_SET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_RESET);
+			break;
+		case 2:
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_6, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_5, GPIO_PIN_RESET);
+			HAL_GPIO_WritePin(GPIOB, GPIO_PIN_7, GPIO_PIN_SET);
+			break;
+
+
+	}
+
+
 
 
 }
-
-
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -304,14 +342,36 @@ void StartDefaultTask(void *argument)
 {
   /* init code for USB_DEVICE */
   MX_USB_DEVICE_Init();
-  //LED_INIT();
-
-
   /* USER CODE BEGIN 5 */
+
+  uint32_t HmiEventFlag;
+
   /* Infinite loop */
   for(;;)
   {
-    osDelay(200);
+
+	  HmiEventFlag=osEventFlagsWait(kbdHMIeventHandle, 0xFFFFU, NULL, osWaitForever);  // wait forever for any flag
+
+	  if (HmiEventFlag & FLAG_LAYOUT_PAGE_UP)
+	  {
+
+		  if (currentKeymapLevel<2)
+		 	currentKeymapLevel++;
+		  else
+			currentKeymapLevel=0;
+
+		  LEDkeymapLevel(currentKeymapLevel);
+	  }
+
+	  if (HmiEventFlag & FLAG_LAYOUT_PAGE_DOWN)
+	  {
+		if (currentKeymapLevel>0)
+			currentKeymapLevel--;
+		else
+			currentKeymapLevel=2;
+
+		LEDkeymapLevel(currentKeymapLevel);
+	  }
   }
   /* USER CODE END 5 */
 }
@@ -346,7 +406,6 @@ void StartTask_kbdMatrixRead(void *argument)
 /* USER CODE END Header_StartTask_processRecord */
 void StartTask_processRecord(void *argument)
 {
-
   /* USER CODE BEGIN StartTask_processRecord */
   /* Infinite loop */
   for(;;)
