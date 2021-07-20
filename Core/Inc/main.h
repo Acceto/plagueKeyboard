@@ -47,7 +47,8 @@ typedef enum{
 typedef enum{
 	MODIFIER,
 	PAGE,
-	UNICODE
+	UNICODE,
+	MACRO
 } KeyType;
 
 typedef struct {
