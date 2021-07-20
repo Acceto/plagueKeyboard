@@ -293,5 +293,9 @@
 #define KEY_MEDIA_REFRESH 0xfa
 #define KEY_MEDIA_CALC 0xfb
 
+//AA: add to layout for kbd layout up and down
+#define KBD_LAYOUT_UP 0xfe
+#define KBD_LAYOUT_DOWN 0xff
+
 
 #endif /* INC_USB_KEYCODE_H_ */
