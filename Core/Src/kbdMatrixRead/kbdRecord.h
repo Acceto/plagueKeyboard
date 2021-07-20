@@ -17,5 +17,6 @@
 
 char kbdRecord(uint8_t *);
 void kbdMatrixRead(void);
+char isValueInArray(uint8_t, uint8_t*, uint8_t);
 
 #endif /* SRC_KBDMATRIXREAD_KBDRECORD_H_ */

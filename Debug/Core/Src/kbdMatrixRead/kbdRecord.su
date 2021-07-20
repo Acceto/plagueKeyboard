@@ -1,2 +1,3 @@
 kbdRecord.c:18:6:kbdRecord	56	static
-kbdRecord.c:122:6:kbdMatrixRead	40	static
+kbdRecord.c:137:6:kbdMatrixRead	40	static
+kbdRecord.c:158:6:isValueInArray	24	static

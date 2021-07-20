@@ -13,15 +13,19 @@
 extern osMessageQueueId_t keyboardRecordQueueHandle;
 extern USBD_HandleTypeDef hUsbDeviceFS;
 
+
+/*void processModifier(){}
+
+
+void processU*/
+
+
 void processRecord(void){
 
 	KEYMSGQUEUE_OBJ_t keyMsgQueueObj;
 	uint32_t queueCount;
 	osStatus_t status;
-	uint8_t firstIdx;
-	uint8_t keyNbr;
 	uint8_t i,keycodeIdx;
-	uint8_t currentModifier;
 
 	queueCount= osMessageQueueGetCount(keyboardRecordQueueHandle);
 
@@ -30,8 +34,6 @@ void processRecord(void){
 
 		if(keyMsgQueueObj.Action==PRESS)
 		{
-			firstIdx=keyMsgQueueObj.Buf[0];
-			keyNbr=keyMsgQueueObj.KeyNbr;
 
 			keycodeIdx=0;
 			keyboardhid=keyboardhid_empty;
@@ -42,6 +44,7 @@ void processRecord(void){
 
 				switch (keyMsgQueueObj.Buf[i])
 					{
+
 					case KEY_LEFTCTRL:
 						keyboardhid.MODIFIER = (globalState.MODIFIER | KEY_MOD_LCTRL);
 						globalState.MODIFIER = keyboardhid.MODIFIER ;
@@ -116,9 +119,6 @@ void processRecord(void){
 
 
 		if(keyMsgQueueObj.Action==RELEASE){
-			firstIdx=keyMsgQueueObj.Buf[0]|0x80;
-			keyNbr=keyMsgQueueObj.KeyNbr;
-
 
 			keycodeIdx=0;
 			keyboardhid=keyboardhid_empty;
@@ -126,6 +126,7 @@ void processRecord(void){
 
 			for(i=0;i<keyMsgQueueObj.KeyNbr;i++)
 			{
+
 
 				switch (keyMsgQueueObj.Buf[i])
 					{

@@ -34,10 +34,24 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 		}
 	}
 
+
+
+
 	if (matrixChanged==True)
 	{
+
+
 		memset(&keyMsgQueueObj, 0, sizeof keyMsgQueueObj);
 		keyIdx=0;
+
+		if(isValueInArray(KBD_LAYOUT_UP,currentPressedKeys,KEY_PRESS_NB_MAX)){
+			currentKeymapLevel++;
+		}
+
+		if(isValueInArray(KBD_LAYOUT_DOWN,currentPressedKeys,KEY_PRESS_NB_MAX)){
+			currentKeymapLevel--;
+		}
+
 
 		//detect newly pressed keys
 		for (i=0;i<KEY_PRESS_NB_MAX;i++)
@@ -65,11 +79,15 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 
 		//send to processRecord in case of key(s) newly pressed
 		if (keyIdx != 0){
-			keyMsgQueueObj.KeyNbr=keyIdx;
-			keyMsgQueueObj.Action=PRESS;
-			keyMsgQueueObj.KeyType=UNICODE;
-			osMessageQueuePut(keyboardRecordQueueHandle,&keyMsgQueueObj,0U,0U);
+				keyMsgQueueObj.KeyNbr=keyIdx;
+				keyMsgQueueObj.Action=PRESS;
+				keyMsgQueueObj.KeyType=UNICODE;
+				osMessageQueuePut(keyboardRecordQueueHandle,&keyMsgQueueObj,0U,0U);
 		}
+
+
+
+
 
 		//detect newly released keys
 		memset(&keyMsgQueueObj, 0, sizeof keyMsgQueueObj);
@@ -135,4 +153,17 @@ void kbdMatrixRead(void){
 
 
     kbdRecord(currentPressedKeys);
+}
+
+
+
+
+char isValueInArray(uint8_t val, uint8_t * array, uint8_t sizeArray){
+	int i;
+	char valFound=0;
+	for (i=0;i<=sizeArray;i++){
+		if (array[i]==val)
+			valFound=1;
+	}
+	return valFound;
 }
