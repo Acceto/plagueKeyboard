@@ -38,6 +38,13 @@ extern "C" {
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
 #define KEY_PRESS_NB_MAX 10
+
+
+#define FLAG_LAYOUT_PAGE_UP 	0b0000000000000001
+#define FLAG_LAYOUT_PAGE_DOWN 	0b0000000000000010
+#define FLAG_MAJLOCK_SET		0b0000000000000100
+#define FLAG_SCROLLLOCK_SET		0b0000000000001000
+
 typedef enum{
 	PRESS,
 	RELEASE
@@ -56,6 +63,16 @@ typedef struct {
   KeyType		KeyType;
   ActionType	Action;
 } KEYMSGQUEUE_OBJ_t;
+
+
+typedef struct
+{
+	uint8_t PAGE;
+	uint8_t MODIFIER;
+	char	MAJ_LOCK;
+	char 	SCROLL_LOCL;
+
+} KBDglobalState;
 
 /* USER CODE END ET */
 
