@@ -35,9 +35,6 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 		}
 	}
 
-
-
-
 	if (matrixChanged==True)
 	{
 
@@ -46,12 +43,12 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 
 		if(isValueInArray(KBD_LAYOUT_UP,currentPressedKeys,KEY_PRESS_NB_MAX)){
 			//currentKeymapLevel++;
-			osEventFlagsSet(kbdHMIeventHandle, 1);
+			osEventFlagsSet(kbdHMIeventHandle, FLAG_LAYOUT_PAGE_UP);
 		}
 
 		if(isValueInArray(KBD_LAYOUT_DOWN,currentPressedKeys,KEY_PRESS_NB_MAX)){
 			//currentKeymapLevel--;
-			osEventFlagsSet(kbdHMIeventHandle, 2);
+			osEventFlagsSet(kbdHMIeventHandle, FLAG_LAYOUT_PAGE_DOWN);
 		}
 
 
@@ -86,10 +83,6 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 				keyMsgQueueObj.KeyType=UNICODE;
 				osMessageQueuePut(keyboardRecordQueueHandle,&keyMsgQueueObj,0U,0U);
 		}
-
-
-
-
 
 		//detect newly released keys
 		memset(&keyMsgQueueObj, 0, sizeof keyMsgQueueObj);
@@ -126,7 +119,6 @@ char kbdRecord(uint8_t *currentPressedKeys ){
 		}
 
 	}
-
 
 	//copy currentPressedKeys in globalPressedKeys
 	for (i=0;i<KEY_PRESS_NB_MAX;i++)
