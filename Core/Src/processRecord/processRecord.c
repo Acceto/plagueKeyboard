@@ -12,6 +12,9 @@
 
 extern osMessageQueueId_t keyboardRecordQueueHandle;
 extern USBD_HandleTypeDef hUsbDeviceFS;
+extern osEventFlagsId_t kbdHMIeventHandle;
+
+KBDglobalState globalState;
 
 
 /*void processModifier(){}
@@ -44,6 +47,9 @@ void processRecord(void){
 
 				switch (keyMsgQueueObj.Buf[i])
 					{
+					case KBD_LAYOUT_UP:
+					case KBD_LAYOUT_DOWN:
+						break;
 
 					case KEY_LEFTCTRL:
 						keyboardhid.MODIFIER = (globalState.MODIFIER | KEY_MOD_LCTRL);
@@ -77,6 +83,34 @@ void processRecord(void){
 						keyboardhid.MODIFIER = (globalState.MODIFIER | KEY_MOD_RMETA);
 						globalState.MODIFIER = keyboardhid.MODIFIER ;
 						break;
+
+					case KEY_SCROLLLOCK:
+						//Add capslock led management
+						if (globalState.SCROLL_LOCL==0)
+							globalState.SCROLL_LOCL=1;
+						else
+							globalState.SCROLL_LOCL=0;
+
+						osEventFlagsSet(kbdHMIeventHandle, FLAG_SCROLLLOCK_SET);
+						keyboardhid.KEYCODE1=keyMsgQueueObj.Buf[i];
+						keycodeIdx++;
+						break;
+
+
+					case KEY_CAPSLOCK:
+						//Add capslock led management
+						if (globalState.MAJ_LOCK==0)
+							globalState.MAJ_LOCK=1;
+						else
+							globalState.MAJ_LOCK=0;
+
+						osEventFlagsSet(kbdHMIeventHandle, FLAG_MAJLOCK_SET);
+						keyboardhid.KEYCODE1=keyMsgQueueObj.Buf[i];
+						keycodeIdx++;
+						break;
+
+					//case KEY_CAPSLOCK:
+
 
 					default:
 						switch (keycodeIdx)
@@ -130,6 +164,10 @@ void processRecord(void){
 
 				switch (keyMsgQueueObj.Buf[i])
 					{
+					case KBD_LAYOUT_UP:
+					case KBD_LAYOUT_DOWN:
+						break;
+
 					case KEY_LEFTCTRL:
 						keyboardhid.MODIFIER = (globalState.MODIFIER ^ KEY_MOD_LCTRL);
 						globalState.MODIFIER = keyboardhid.MODIFIER ;
