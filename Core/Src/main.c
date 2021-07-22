@@ -34,12 +34,7 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-#define FLAG_LAYOUT_PAGE_UP 	0b0000000000000001
-#define FLAG_LAYOUT_PAGE_DOWN 	0b0000000000000010
-#define FLAG_MAJLOCK_SET		0b0000000000000100
-#define FLAG_MAJLOCK_RESET		0b0000000000001000
-#define FLAG_SCROLLLOCK_SET		0b0000000000010000
-#define FLAG_SCROLLLOCK_RESET	0b0000000000100000
+
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -81,6 +76,7 @@ const osEventFlagsAttr_t kbdHMIevent_attributes = {
 };
 /* USER CODE BEGIN PV */
 extern uint8_t currentKeymapLevel;
+extern KBDglobalState globalState;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -324,11 +320,34 @@ void LEDkeymapLevel(uint8_t KBDlayoutLevel){
 
 
 	}
-
-
-
-
 }
+
+
+void LEDmajLock(char ledState){
+	switch(ledState){
+		default:
+		case 0:
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_9, GPIO_PIN_SET);
+	}
+}
+
+
+void LEDScrollLock(char ledState){
+	switch(ledState){
+		default:
+		case 0:
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_RESET);
+			break;
+		case 1:
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
+	}
+}
+
+
+
 /* USER CODE END 4 */
 
 /* USER CODE BEGIN Header_StartDefaultTask */
@@ -350,28 +369,52 @@ void StartDefaultTask(void *argument)
   for(;;)
   {
 
-	  HmiEventFlag=osEventFlagsWait(kbdHMIeventHandle, 0xFFFFU, NULL, osWaitForever);  // wait forever for any flag
+	  HmiEventFlag=osEventFlagsWait(kbdHMIeventHandle, 0xFFFFU, NULL, 1000/*osWaitForever*/);  // wait forever for any flag
 
-	  if (HmiEventFlag & FLAG_LAYOUT_PAGE_UP)
-	  {
+	  if (HmiEventFlag!=0xfffffffe){
+		  if (HmiEventFlag & FLAG_LAYOUT_PAGE_UP)
+		  {
 
-		  if (currentKeymapLevel<2)
-		 	currentKeymapLevel++;
-		  else
-			currentKeymapLevel=0;
+			  if (currentKeymapLevel<2)
+				currentKeymapLevel++;
+			  else
+				currentKeymapLevel=0;
 
-		  LEDkeymapLevel(currentKeymapLevel);
+			  LEDkeymapLevel(currentKeymapLevel);
+		  }
+
+		  if (HmiEventFlag & FLAG_LAYOUT_PAGE_DOWN)
+		  {
+			  if (currentKeymapLevel>0)
+				  currentKeymapLevel--;
+			  else
+				  currentKeymapLevel=2;
+
+			LEDkeymapLevel(currentKeymapLevel);
+		  }
+
+		  if (HmiEventFlag & FLAG_MAJLOCK_SET)
+		  {
+			  if (globalState.MAJ_LOCK==1)
+				  LEDmajLock(1);
+			  else
+				  LEDmajLock(0);
+
+		  }
+
+		  if (HmiEventFlag & FLAG_SCROLLLOCK_SET)
+		  {
+			  if (globalState.SCROLL_LOCL==1)
+				  LEDScrollLock(1);
+			  else
+				  LEDScrollLock(0);
+
+		  }
+
+
 	  }
 
-	  if (HmiEventFlag & FLAG_LAYOUT_PAGE_DOWN)
-	  {
-		if (currentKeymapLevel>0)
-			currentKeymapLevel--;
-		else
-			currentKeymapLevel=2;
 
-		LEDkeymapLevel(currentKeymapLevel);
-	  }
   }
   /* USER CODE END 5 */
 }
