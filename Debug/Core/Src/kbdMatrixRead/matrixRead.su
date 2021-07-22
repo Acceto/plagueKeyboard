@@ -1,5 +1,0 @@
-matrixRead.c:15:6:bWriteColumnState	16	static
-matrixRead.c:45:5:bReadRowState	24	static
-matrixRead.c:80:5:intReadRowState	16	static
-matrixRead.c:106:7:intReadMatrix	16	static
-matrixRead.c:140:15:ReadMatrixState	16	static
