@@ -29,17 +29,4 @@ const keyboardHID keyboardhid_empty = {0,0,0,0,0,0,0,0};
 
 
 
-
-typedef struct
-{
-	uint8_t PAGE;
-	uint8_t MODIFIER;
-	char	MAJ_LOCK;
-	char 	SCROLL_LOCL;
-
-} KBDglobalState;
-
-KBDglobalState globalState;
-
-
 #endif /* SRC_PROCESSRECORD_PROCESSRECORD_H_ */
